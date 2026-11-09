@@ -65,7 +65,9 @@ TARGET_KERNEL_SOURCE := kernel/samsung/exynos7885
 TARGET_KERNEL_NO_GCC := true
 
 # Keymaster
+ifeq ($(BOARD_SEPOLICY_TEE_FLAVOR),teegris)
 $(call soong_config_set,samsungVars,target_keymaster4_library,//vendor/samsung/exynos7885-common:libskeymaster4device)
+endif
 
 # Manifest
 DEVICE_MANIFEST_FILE := $(COMMON_PATH)/manifest.xml
@@ -119,7 +121,8 @@ BOARD_ROOT_EXTRA_SYMLINKS := /factory:/efs
 ENABLE_VENDOR_RIL_SERVICE := true
 
 # Sepolicy
-BOARD_SEPOLICY_TEE_FLAVOR := teegris
+# Devices with Trustonic (e.g. jackpotlte) set mobicore before including this file.
+BOARD_SEPOLICY_TEE_FLAVOR ?= teegris
 include device/lineage/sepolicy/exynos/sepolicy.mk
 include device/samsung_slsi/sepolicy/sepolicy.mk
 include hardware/samsung-ext/interfaces/sepolicy/SEPolicy.mk

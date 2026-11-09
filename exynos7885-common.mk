@@ -6,6 +6,14 @@
 # Call proprietary blob setup
 $(call inherit-product, vendor/samsung/exynos7885-common/exynos7885-common-vendor.mk)
 
+# TEE: TEEGRIS by default; a device with Trustonic sets
+# TARGET_EXYNOS7885_TEE := mobicore before inheriting this file and ships its
+# own TEE, keymaster and Widevine blobs.
+TARGET_EXYNOS7885_TEE ?= teegris
+ifeq ($(TARGET_EXYNOS7885_TEE),teegris)
+$(call inherit-product, vendor/samsung/exynos7885-common/exynos7885-common-teegris-vendor.mk)
+endif
+
 # Include debug tools
 $(call inherit-product, hardware/samsung-ext/interfaces/debug-tools/debug.mk)
 
@@ -88,18 +96,27 @@ PRODUCT_PACKAGES += \
 
 # Init
 PRODUCT_PACKAGES += \
+    fstab.enableswap
+
+# A device whose bootloader passes another androidboot.hardware name or whose
+# partitions are named differently (jackpotlte: samsungexynos7885, upper case
+# names) sets TARGET_EXYNOS7885_DEVICE_ROOTDIR := true and ships these itself.
+ifneq ($(TARGET_EXYNOS7885_DEVICE_ROOTDIR),true)
+PRODUCT_PACKAGES += \
     init.$(TARGET_SOC).rc \
     init.$(TARGET_SOC).usb.rc \
     fstab.$(TARGET_SOC) \
-    fstab.enableswap \
     ueventd.exynos7885.rc
 
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/rootdir/etc/fstab.exynos7885:$(TARGET_COPY_OUT_RAMDISK)/vendor/etc/fstab.$(TARGET_SOC)
+endif
 
 # Keymaster
+ifeq ($(TARGET_EXYNOS7885_TEE),teegris)
 PRODUCT_PACKAGES += \
     android.hardware.keymaster@4.0-service.samsung
+endif
 
 # Media
 PRODUCT_PACKAGES += \
