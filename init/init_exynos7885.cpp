@@ -99,6 +99,8 @@ void vendor_load_properties() {
   // Exceptions
   isNFC |= model == "SM-A202F";
   isNFC |= model == "SM-A405FM";
+  isNFC |= model == "SM-A530F";
+  isNFC |= model == "SM-A530W";
 
   setLowRamProp();
 
